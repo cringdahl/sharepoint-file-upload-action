@@ -1,0 +1,52 @@
+# action.yaml
+name: 'Upload File to Sharepoint'
+description: 'Upload one or more files in a directory to Sharepoint site using client ID'
+inputs:
+  file_path:
+    description: 'Source file path (glob ok)'
+    required: true
+  site_name:
+    description: 'Sharepoint site name (see README.md)'
+    required: true
+  host_name:
+    description: 'Sharepoint host name (see README.md)'
+    required: true
+  upload_path:
+    description: 'Target upload path (see README.md)'
+    required: true
+  tenant_id:
+    description: 'Sharepoint tenant ID'
+    required: true
+  client_id:
+    description: 'Sharepoint client ID'
+    required: true
+  client_secret:
+    description: 'Sharepoint client secret'
+    required: true
+outputs:
+  return:
+    description: 'Function output'
+    # need to specify the extra `value` field for `composite` actions
+    value: ${{ steps.send-file.outputs.return }}
+runs:
+  using: 'composite'
+  steps:
+    - name: Install Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    - name: Install Dependencies
+      run: pip install -r requirements.txt
+      shell: bash
+    - name: Send file(s) to Sharepoint
+      id: send-file
+      run: python src/send_to_sharepoint.py
+      shell: bash
+      env:
+        SHAREPOINT_FILE_PATH : ${{ inputs.file_path }}
+        SHAREPOINT_SITE_NAME : ${{ inputs.site_name }}
+        SHAREPOINT_HOST_NAME : ${{ inputs.host_name }}
+        SHAREPOINT_UPLOAD_PATH : ${{ inputs.upload_path }}
+        SHAREPOINT_TENANT_ID : ${{ inputs.tenant_id }}
+        SHAREPOINT_CLIENT_ID : ${{ inputs.client_id }}
+        SHAREPOINT_CLIENT_SECRET : ${{ inputs.client_secret }}
