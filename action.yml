@@ -29,24 +29,13 @@ outputs:
     # need to specify the extra `value` field for `composite` actions
     value: ${{ steps.send-file.outputs.return }}
 runs:
-  using: 'composite'
-  steps:
-    - name: Install Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-    - name: Install Dependencies
-      run: pip install -r requirements.txt
-      shell: bash
-    - name: Send file(s) to Sharepoint
-      id: send-file
-      run: python src/send_to_sharepoint.py
-      shell: bash
-      env:
-        SHAREPOINT_FILE_PATH : ${{ inputs.file_path }}
-        SHAREPOINT_SITE_NAME : ${{ inputs.site_name }}
-        SHAREPOINT_HOST_NAME : ${{ inputs.host_name }}
-        SHAREPOINT_UPLOAD_PATH : ${{ inputs.upload_path }}
-        SHAREPOINT_TENANT_ID : ${{ inputs.tenant_id }}
-        SHAREPOINT_CLIENT_ID : ${{ inputs.client_id }}
-        SHAREPOINT_CLIENT_SECRET : ${{ inputs.client_secret }}
+  using: 'docker'
+  image: 'Dockerfile'
+  args: 
+    - ${{ inputs.site_name }}
+    - ${{ inputs.host_name }}
+    - ${{ inputs.tenant_id }}
+    - ${{ inputs.client_id }}
+    - ${{ inputs.client_secret }}
+    - ${{ inputs.upload_path }}
+    - ${{ inputs.file_path }}

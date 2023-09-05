@@ -1,18 +1,15 @@
-from dotenv import load_dotenv
-import os
+import sys
 import msal
 from office365.graph_client import GraphClient
 import glob
 
-load_dotenv() # where we keep token info during local dev
-
-site_name = os.environ['SHAREPOINT_SITE_NAME']
-sharepoint_host_name = os.environ['SHAREPOINT_HOST_NAME']
-tenant_id = os.environ['SHAREPOINT_TENANT_ID']
-client_id = os.environ['SHAREPOINT_CLIENT_ID']
-client_secret = os.environ['SHAREPOINT_CLIENT_SECRET']
-upload_path = os.environ['SHAREPOINT_UPLOAD_PATH']
-file_path = os.environ['SHAREPOINT_FILE_PATH']
+site_name = sys.argv[1]
+sharepoint_host_name = sys.argv[2]
+tenant_id = sys.argv[3]
+client_id = sys.argv[4]
+client_secret = sys.argv[5]
+upload_path = sys.argv[6]
+file_path = sys.argv[7]
 
 # below used with 'get_by_url' in GraphClient calls
 tenant_url = f'https://{sharepoint_host_name}/sites/{site_name}'

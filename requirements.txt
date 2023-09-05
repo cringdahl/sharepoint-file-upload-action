@@ -1,2 +1,2 @@
-python-dotenv
-Office365-REST-Python-Client
+python-dotenv==1.0.0
+Office365-REST-Python-Client==2.4.4
