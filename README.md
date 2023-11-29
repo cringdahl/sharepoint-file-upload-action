@@ -21,7 +21,7 @@ The following will be provided to you by your Sharepoint administrator when you 
 * `client_id`
 * `client_secret`
 
-You will also need to provide
+You will also need to provide the file or files being sent:
 
 * `file_path`
   * A glob; something like `file.txt` or `*.md`
