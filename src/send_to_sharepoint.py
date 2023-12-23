@@ -47,7 +47,6 @@ def upload_file(drive, local_path, chunk_size):
     if file_size < chunk_size:
         return drive.upload_file(local_path).execute_query()
     else:
-        
         def _start_upload():
             print(f"Starting upload session for {local_path}")
             with open(local_path, 'rb') as local_file:
@@ -57,16 +56,11 @@ def upload_file(drive, local_path, chunk_size):
                 request.execute_query(query)
 
         file_name = os.path.basename(local_path)
-        print(f"file_name: {file_name}")
         drive_item = DriveItem(drive.context, UrlPath(file_name, drive.resource_path))
-        print(f"drive_item: {drive_item}")
         drive_item_properties = {"item": DriveItemUploadableProperties(name=file_name, file_size=file_size)}
-        print(f"drive_item_properties: {drive_item_properties}")
         query = UploadSessionQuery(drive_item, drive_item_properties)
-        print(f"query: {query}")
         drive.context.add_query(query).after_query_execute(_start_upload)
-        print(f"drive.context: {drive.context}")
-        return drive_item.get().execute_query()
+        return drive_item.execute_query()
 
 for f in local_files:
   try:
