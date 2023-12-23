@@ -39,8 +39,9 @@ def progress_status(offset, file_size):
     print(f"Uploaded {offset} bytes of {file_size} ... {offset/file_size*100:.2f}%")
 
 def upload_file(drive, local_path, chunk_size):
-    print(f"Uploading {local_path}...")
+    absolute_path = os.path.abspath(local_path)
     file_size = os.path.getsize(local_path)
+    print(f"Uploading {absolute_path} ({file_size} bytes).")
     if file_size < chunk_size:
         remote_file = drive.upload_file(local_path).execute_query()
         print(f"File {remote_file.web_url} has been uploaded")
