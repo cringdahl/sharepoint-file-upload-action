@@ -66,7 +66,7 @@ def upload_file(drive, local_path, chunk_size):
         print(f"query: {query}")
         drive.context.add_query(query).after_query_execute(_start_upload)
         print(f"drive.context: {drive.context}")
-        return drive_item
+        return drive_item.get().execute_query()
 
 for f in local_files:
   try:
