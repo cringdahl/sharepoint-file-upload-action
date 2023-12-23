@@ -35,8 +35,8 @@ def acquire_token():
 client = GraphClient(acquire_token)
 drive = client.sites.get_by_url(tenant_url).drive.root.get_by_path(upload_path)
 
-def progress_status(offset, file_size):
-    print(f"Uploaded {offset} bytes of {file_size} ... {offset/file_size*100:.2f}%")
+def progress_status(offset):
+    print(f"Uploaded {offset} bytes")
 
 def upload_file(drive, local_path, chunk_size):
     absolute_path = os.path.abspath(local_path)
