@@ -43,8 +43,7 @@ def upload_file(drive, local_path, chunk_size=4194304):
        remote_file = drive.resumable_upload(
             local_path,
             chunk_size=chunk_size,
-            chunk_uploaded=progress_status,
-            **{'file_size': file_size}
+            chunk_uploaded=progress_status
         ).get().execute_query()
 
 def progress_status(offset, file_size):
