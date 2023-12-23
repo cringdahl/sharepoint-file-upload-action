@@ -58,6 +58,7 @@ def upload_file(drive, local_path, chunk_size):
         drive_item_properties = DriveItemUploadableProperties(name=file_name, file_size=file_size)
         query = UploadSessionQuery(drive_item, drive_item_properties)
         drive.context.add_query(query).after_query_execute(_start_upload)
+        return drive_item
 
 for f in local_files:
   try:
