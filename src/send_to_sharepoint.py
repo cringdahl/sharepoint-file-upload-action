@@ -54,4 +54,5 @@ for f in local_files:
   try:
     upload_file(drive, f, 4 * 1024 * 1024)
   except Exception as e:
-    print(f"Unexpected error occurred: {e}, {type(e)}, {sys.exc_info()[2].tb_lineno}, {__file__}")
+    # print stacktrace
+    print(f"Unexpected error occurred: {e}, {type(e)}, {e.args}")
