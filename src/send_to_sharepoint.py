@@ -34,10 +34,14 @@ def acquire_token():
 client = GraphClient(acquire_token)
 drive = client.sites.get_by_url(tenant_url).drive.root.get_by_path(upload_path)
 
-def upload_file(drive, local_path, chunk_size=4194304):
+def progress_status(offset, file_size):
+    print(f"Uploaded {offset} bytes of {file_size} ... {offset/file_size*100:.2f}%")
+
+def upload_file(drive, local_path, chunk_size):
+    print(f"Uploading {local_path}...")
     file_size = os.path.getsize(local_path)
     if file_size < chunk_size:
-        remote_file = drive.upload_file(local_path, **kwargs).execute_query()
+        remote_file = drive.upload_file(local_path).execute_query()
         print(f"File {remote_file.web_url} has been uploaded")
     else:
        remote_file = drive.resumable_upload(
@@ -46,11 +50,8 @@ def upload_file(drive, local_path, chunk_size=4194304):
             chunk_uploaded=progress_status
         ).get().execute_query()
 
-def progress_status(offset, file_size):
-    print(f"Uploaded {offset} bytes of {file_size} ... {offset/file_size*100:.2f}%")
-
 for f in local_files:
   try:
-    upload_file(drive, f)
+    upload_file(drive, f, 4 * 1024 * 1024)
   except Exception as e:
     print(f"Unexpected error occurred: {e}, {type(e)}")
