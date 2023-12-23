@@ -48,11 +48,8 @@ def upload_file(drive, local_path, chunk_size):
         return drive.upload_file(local_path).execute_query()
     else:
         def _start_upload():
-            print(f"Starting upload session for {local_path}")
             with open(local_path, 'rb') as local_file:
-                print(f"chunk_size: {chunk_size}")
                 request = UploadSessionRequest(local_file, chunk_size, progress_status)
-                print(f"executing request: {request}")
                 request.execute_query(query)
 
         file_name = os.path.basename(local_path)
