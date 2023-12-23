@@ -41,7 +41,7 @@ def upload_file(drive, f, chunk_size=4194304):
         print(f"File {remote_file.web_url} has been uploaded")
     else:
        drive.create_upload_session(
-            source_path=f,
+            local_path=f,
             chunk_size=chunk_size,
             chunk_uploaded=progress_status,
             **{'file_size': file_size}
