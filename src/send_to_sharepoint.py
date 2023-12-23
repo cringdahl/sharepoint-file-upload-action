@@ -32,17 +32,7 @@ def acquire_token():
     return token
 
 client = GraphClient(acquire_token)
-root = client.sites.get_by_url(tenant_url).drive.root
-print(f"Root: {root}")
-print(f"Root Resource Path: {root.resource_path}")
-print(f"Root name: {root.name}")
-print(f"Root URL: {root.web_url}")
-
-drive = root.get_by_path(upload_path)
-print(f"Drive {drive}")
-print(f"Drive Resource Path: {drive.resource_path}")
-print(f"Drive name: {drive.name}")
-print(f"Drive URL: {drive.web_url}")
+drive = client.sites.get_by_url(tenant_url).drive.root.get_by_path(upload_path)
 
 def progress_status(offset, file_size):
     print(f"Uploaded {offset} bytes of {file_size} ... {offset/file_size*100:.2f}%")
@@ -64,4 +54,4 @@ for f in local_files:
   try:
     upload_file(drive, f, 4 * 1024 * 1024)
   except Exception as e:
-    print(f"Unexpected error occurred: {e}, {type(e)}")
+    print(f"Unexpected error occurred: {e}, {type(e)}, {sys.exc_info()[2].tb_lineno}, {__file__}")
