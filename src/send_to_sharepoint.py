@@ -2,6 +2,11 @@ import sys
 import os
 import msal
 from office365.graph_client import GraphClient
+from office365.onedrive.driveitems.driveItem import DriveItem
+from office365.onedrive.internal.paths.url import UrlPath
+from office365.onedrive.driveitems.uploadable_properties import DriveItemUploadableProperties
+from office365.runtime.odata.v4.upload_session_request import UploadSessionRequest
+from office365.runtime.queries.upload_session import UploadSessionQuery
 import glob
 
 site_name = sys.argv[1]
@@ -42,11 +47,17 @@ def upload_file(drive, local_path, chunk_size):
     if file_size < chunk_size:
         return drive.upload_file(local_path).execute_query()
     else:
-        return drive.create_upload_session(
-            local_path,
-            chunk_size=chunk_size,
-            chunk_uploaded=(lambda offset: progress_status(offset, file_size))
-        ).get().execute_query()
+        
+        def _start_upload():
+            with open(local_path, 'rb') as local_file:
+                request = UploadSessionRequest(local_file, chunk_size, progress_status)
+                request.execute_query(query)
+
+        file_name = os.path.basename(local_path)
+        drive_item = DriveItem(drive.context, UrlPath(file_name, drive.resource_path))
+        drive_item_properties = DriveItemUploadableProperties(name=file_name, file_size=file_size)
+        query = UploadSessionQuery(drive_item, drive_item_properties)
+        drive.context.add_query(query).after_query_execute(_start_upload)
 
 for f in local_files:
   try:
