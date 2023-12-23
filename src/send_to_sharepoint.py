@@ -42,7 +42,7 @@ def upload_file(drive, local_path, chunk_size):
     if file_size < chunk_size:
         return drive.upload_file(local_path).execute_query()
     else:
-        return drive.resumable_upload(
+        return drive.create_upload_session(
             local_path,
             chunk_size=chunk_size,
             chunk_uploaded=(lambda offset: progress_status(offset, file_size))
