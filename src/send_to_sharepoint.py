@@ -32,7 +32,15 @@ def acquire_token():
     return token
 
 client = GraphClient(acquire_token)
-drive = client.sites.get_by_url(tenant_url).drive.root.get_by_path(upload_path)
+root = client.sites.get_by_url(tenant_url).drive.root
+print(f"Root: {root}")
+print(f"Root Resource Path: {root.resource_path}")
+print(f"Root name: {root.name}")
+print(f"Root URL: {root.web_url}")
+
+drive = root.get_by_path(upload_path)
+print(f"Drive {drive}")
+print(f"Drive Resource Path: {drive.resource_path}")
 print(f"Drive name: {drive.name}")
 print(f"Drive URL: {drive.web_url}")
 
