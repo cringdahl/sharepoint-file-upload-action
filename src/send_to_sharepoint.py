@@ -36,9 +36,10 @@ drive = client.sites.get_by_url(tenant_url).drive.root.get_by_path(upload_path)
 def upload_file(self, drive, f, chunk_size=4194304):
     file_size = os.path.getsize(f)
     if file_size < chunk_size:
-        return drive.upload_file(f, **kwargs).execute_query()
+        remote_file = drive.upload_file(f, **kwargs).execute_query()
+        print(f"File {remote_file.web_url} has been uploaded")
     else:
-       return drive.create_upload_session(
+       drive.create_upload_session(
             source_path=f,
             chunk_size=chunk_size,
             chunk_uploaded=progress_status,
@@ -50,8 +51,6 @@ def progress_status(offset, file_size):
 
 for f in local_files:
   try:
-    remote_file = upload_file(drive, f)
+    upload_file(drive, f)
   except Exception as e:
     print(f"Unexpected error occurred: {e}, {type(e)}")
-  finally:
-    print(f"File {remote_file.web_url} has been uploaded")
