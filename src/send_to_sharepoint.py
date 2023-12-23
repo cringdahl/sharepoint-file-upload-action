@@ -1,3 +1,4 @@
+import traceback
 import sys
 import os
 import msal
@@ -54,4 +55,4 @@ for f in local_files:
   try:
     upload_file(drive, f, 4 * 1024 * 1024)
   except Exception as e:
-    print(e)
+    print(traceback.format_exc())
