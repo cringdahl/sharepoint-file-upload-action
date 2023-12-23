@@ -1,4 +1,5 @@
 import sys
+import os
 import msal
 from office365.graph_client import GraphClient
 import glob
@@ -33,7 +34,7 @@ def acquire_token():
 client = GraphClient(acquire_token)
 drive = client.sites.get_by_url(tenant_url).drive.root.get_by_path(upload_path)
 
-def upload_file(self, drive, f, chunk_size=4194304):
+def upload_file(drive, f, chunk_size=4194304):
     file_size = os.path.getsize(f)
     if file_size < chunk_size:
         remote_file = drive.upload_file(f, **kwargs).execute_query()
