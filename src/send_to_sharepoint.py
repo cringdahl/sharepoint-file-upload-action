@@ -1,4 +1,3 @@
-import traceback
 import sys
 import os
 import msal
@@ -35,25 +34,24 @@ def acquire_token():
 client = GraphClient(acquire_token)
 drive = client.sites.get_by_url(tenant_url).drive.root.get_by_path(upload_path)
 
-def progress_status(offset):
-    print(f"Uploaded {offset} bytes")
+def progress_status(offset, file_size):
+    print(f"Uploaded {offset} bytes from {file_size} bytes ... {offset/file_size*100:.2f}%")
 
 def upload_file(drive, local_path, chunk_size):
-    absolute_path = os.path.abspath(local_path)
     file_size = os.path.getsize(local_path)
-    print(f"Uploading {absolute_path} ({file_size} bytes).")
     if file_size < chunk_size:
-        remote_file = drive.upload_file(local_path).execute_query()
-        print(f"File {remote_file.web_url} has been uploaded")
+        return drive.upload_file(local_path).execute_query()
     else:
-       remote_file = drive.resumable_upload(
+        return drive.resumable_upload(
             local_path,
             chunk_size=chunk_size,
-            chunk_uploaded=progress_status
+            chunk_uploaded=(lambda offset: progress_status(offset, file_size))
         ).get().execute_query()
 
 for f in local_files:
   try:
-    upload_file(drive, f, 4 * 1024 * 1024)
+    remote_file = upload_file(drive, f, 4 * 1024 * 1024)
   except Exception as e:
-    print(traceback.format_exc())
+    print(f"Unexpected error occurred: {e}, {type(e)}")
+  finally:
+    print(f"File {remote_file.web_url} has been uploaded")
