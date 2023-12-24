@@ -54,9 +54,9 @@ def upload_file(drive, local_path, chunk_size):
 
         file_name = os.path.basename(local_path)
         drive_item = DriveItem(drive.context, UrlPath(file_name, drive.resource_path))
-        print(f"Uploading {file_name} to {drive_item.web_url} ...")
-        drive_item_properties = {"item": DriveItemUploadableProperties(name=file_name, file_size=file_size)}
-        query = UploadSessionQuery(drive_item, drive_item_properties)
+        drive_item_properties = DriveItemUploadableProperties(name=file_name, file_size=file_size)
+        query = UploadSessionQuery(drive_item, {"item": drive_item_properties})
+        print(f"file_name: {file_name}, file_size: {file_size}, drive_resource_path: {drive.resource_path}, drive_item: {drive_item}, drive_item_properties: {drive_item_properties}, query: {query}")
         drive.context.add_query(query).after_query_execute(_start_upload)
         return drive_item.get().execute_query()
 
