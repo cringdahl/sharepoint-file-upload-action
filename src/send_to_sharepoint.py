@@ -49,7 +49,7 @@ def upload_file(drive, local_path, chunk_size):
     else:
         def _start_upload():
             with open(local_path, 'rb') as local_file:
-                request = UploadSessionRequest(local_file, chunk_size, progress_status)
+                request = UploadSessionRequest(local_file, chunk_size, (lambda offset: progress_status(offset, file_size)))
                 request.execute_query(query)
 
         file_name = os.path.basename(local_path)
