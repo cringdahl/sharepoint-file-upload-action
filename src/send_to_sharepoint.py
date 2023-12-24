@@ -2,11 +2,6 @@ import sys
 import os
 import msal
 from office365.graph_client import GraphClient
-from office365.onedrive.driveitems.driveItem import DriveItem
-from office365.onedrive.internal.paths.url import UrlPath
-from office365.onedrive.driveitems.uploadable_properties import DriveItemUploadableProperties
-from office365.runtime.odata.v4.upload_session_request import UploadSessionRequest
-from office365.runtime.queries.upload_session import UploadSessionQuery
 import glob
 
 site_name = sys.argv[1]
@@ -47,22 +42,19 @@ def upload_file(drive, local_path, chunk_size):
     if file_size < chunk_size:
         return drive.upload_file(local_path).execute_query()
     else:
-        def _start_upload():
-            with open(local_path, 'rb') as local_file:
-                request = UploadSessionRequest(local_file, chunk_size, (lambda offset: progress_status(offset, file_size)))
-                request.execute_query(query)
-
-        file_name = os.path.basename(local_path)
-        drive_item = DriveItem(drive.context, UrlPath(file_name, drive.resource_path))
-        drive_item_properties = DriveItemUploadableProperties(name=file_name)
-        query = UploadSessionQuery(drive_item, {"item": drive_item_properties})
-        print(f"file_name: {file_name}, file_size: {file_size}, drive_resource_path: {drive.resource_path}, drive_item: {drive_item}, drive_item_properties: {drive_item_properties}, query: {query}")
-        drive.context.add_query(query).after_query_execute(_start_upload)
-        return drive_item.get().execute_query()
+        return drive.resumable_upload(
+            local_path,
+            chunk_size=chunk_size,
+            chunk_uploaded=(lambda offset: progress_status(offset, file_size))
+        ).get().execute_query_retry(
+           max_retry=60,
+           timeout_secs=5*60,
+           failure_callback=(lambda retry_number, ex: print(f"Retry {retry_number}: {ex}"))
+        )
 
 for f in local_files:
   try:
-    remote_file = upload_file(drive, f, 4 * 1024 * 1024)
+    remote_file = upload_file(drive, f, 4*1024*1024)
   except Exception as e:
     print(f"Unexpected error occurred: {e}, {type(e)}")
   finally:
