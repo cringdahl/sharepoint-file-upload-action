@@ -1,8 +1,13 @@
 import sys
 import os
 import msal
-from office365.graph_client import GraphClient
 import glob
+from office365.graph_client import GraphClient
+from office365.runtime.odata.v4.upload_session_request import UploadSessionRequest
+from office365.onedrive.driveitems.driveItem import DriveItem
+from office365.onedrive.internal.paths.url import UrlPath
+from office365.runtime.queries.upload_session import UploadSessionQuery
+from office365.onedrive.driveitems.uploadable_properties import DriveItemUploadableProperties
 
 site_name = sys.argv[1]
 sharepoint_host_name = sys.argv[2]
@@ -37,22 +42,49 @@ drive = client.sites.get_by_url(tenant_url).drive.root.get_by_path(upload_path)
 def progress_status(offset, file_size):
     print(f"Uploaded {offset} bytes from {file_size} bytes ... {offset/file_size*100:.2f}%")
 
+def failure_callback(retry_number, ex):
+    print(f"Retry {retry_number}: {ex}")
+
+def success_callback(remote_file):
+    print(f"File {remote_file.web_url} has been uploaded")
+
+def resumable_upload(drive, local_path, file_size, chunk_size, max_retry, timeout_secs):
+    def _start_upload():
+        with open(local_path, "rb") as local_file:
+            session_request = UploadSessionRequest(
+                local_file, 
+                chunk_size, 
+                lambda offset: progress_status(offset, file_size)
+            )
+            session_request.execute_query_retry(
+                qry,
+                max_retry=max_retry,
+                timeout_secs=timeout_secs,
+                success_callback=success_callback,
+                failure_callback=failure_callback)
+    
+    file_name = os.path.basename(local_path)
+    return_type = DriveItem(
+        drive.context, 
+        UrlPath(file_name, drive.resource_path))
+    qry = UploadSessionQuery(
+        return_type, {"item": DriveItemUploadableProperties(name=file_name)})
+    drive.context.add_query(qry).after_query_execute(_start_upload)
+    return_type.get().execute_query()
+
 def upload_file(drive, local_path, chunk_size):
     file_size = os.path.getsize(local_path)
     if file_size < chunk_size:
         remote_file = drive.upload_file(local_path).execute_query()
-        print(f"File {remote_file.web_url} has been uploaded")
+        success_callback(remote_file)
     else:
-        return drive.resumable_upload(
-            local_path,
-            chunk_size=chunk_size,
-            chunk_uploaded=(lambda offset: progress_status(offset, file_size))
-        ).get().execute_query_retry(
-           max_retry=60,
-           timeout_secs=5*60,
-           failure_callback=(lambda retry_number, ex: print(f"Retry {retry_number}: {ex}")),
-           success_callback=(lambda remote_file: print(f"File {remote_file.web_url} has been uploaded"))
-        )
+        return resumable_upload(
+            drive, 
+            local_path, 
+            file_size, 
+            chunk_size, 
+            max_retry=60, 
+            timeout_secs=5*60)
 
 for f in local_files:
   try:
