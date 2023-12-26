@@ -40,7 +40,8 @@ def progress_status(offset, file_size):
 def upload_file(drive, local_path, chunk_size):
     file_size = os.path.getsize(local_path)
     if file_size < chunk_size:
-        return drive.upload_file(local_path).execute_query()
+        remote_file = drive.upload_file(local_path).execute_query()
+        print(f"File {remote_file.web_url} has been uploaded")
     else:
         return drive.resumable_upload(
             local_path,
@@ -49,7 +50,8 @@ def upload_file(drive, local_path, chunk_size):
         ).get().execute_query_retry(
            max_retry=60,
            timeout_secs=5*60,
-           failure_callback=(lambda retry_number, ex: print(f"Retry {retry_number}: {ex}"))
+           failure_callback=(lambda retry_number, ex: print(f"Retry {retry_number}: {ex}")),
+           success_callback=(lambda remote_file: print(f"File {remote_file.web_url} has been uploaded"))
         )
 
 for f in local_files:
@@ -57,5 +59,3 @@ for f in local_files:
     remote_file = upload_file(drive, f, 4*1024*1024)
   except Exception as e:
     print(f"Unexpected error occurred: {e}, {type(e)}")
-  finally:
-    print(f"File {remote_file.web_url} has been uploaded")
