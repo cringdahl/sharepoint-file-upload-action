@@ -43,9 +43,6 @@ drive = client.sites.get_by_url(tenant_url).drive.root.get_by_path(upload_path)
 def progress_status(offset, file_size):
     print(f"Uploaded {offset} bytes from {file_size} bytes ... {offset/file_size*100:.2f}%")
 
-def failure_callback(retry_number, ex):
-    print(f"Retry {retry_number}: {ex}")
-
 def success_callback(remote_file):
     print(f"File {remote_file.web_url} has been uploaded")
 
@@ -65,8 +62,12 @@ def resumable_upload(drive, local_path, file_size, chunk_size, max_retry, timeou
                         break
                     except Exception as e:
                         retries += 1
+                        if retries >= max_retry:
+                            raise e
                         print(f"Retry {retry_number}: {e}")
                         time.sleep(retry_seconds)
+            
+            success_callback(return_type)
     
     file_name = os.path.basename(local_path)
     return_type = DriveItem(
