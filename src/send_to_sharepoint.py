@@ -66,8 +66,6 @@ def resumable_upload(drive, local_path, file_size, chunk_size, max_retry, timeou
                             raise e
                         print(f"Retry {retry_number}: {e}")
                         time.sleep(retry_seconds)
-            
-            success_callback(return_type)
     
     file_name = os.path.basename(local_path)
     return_type = DriveItem(
@@ -77,6 +75,7 @@ def resumable_upload(drive, local_path, file_size, chunk_size, max_retry, timeou
         return_type, {"item": DriveItemUploadableProperties(name=file_name)})
     drive.context.add_query(qry).after_query_execute(_start_upload)
     return_type.get().execute_query()
+    success_callback(return_type)
 
 def upload_file(drive, local_path, chunk_size):
     file_size = os.path.getsize(local_path)
@@ -84,7 +83,7 @@ def upload_file(drive, local_path, chunk_size):
         remote_file = drive.upload_file(local_path).execute_query()
         success_callback(remote_file)
     else:
-        return resumable_upload(
+        resumable_upload(
             drive, 
             local_path, 
             file_size, 
@@ -94,6 +93,6 @@ def upload_file(drive, local_path, chunk_size):
 
 for f in local_files:
   try:
-    remote_file = upload_file(drive, f, 4*1024*1024)
+    upload_file(drive, f, 4*1024*1024)
   except Exception as e:
     print(f"Unexpected error occurred: {e}, {type(e)}")
