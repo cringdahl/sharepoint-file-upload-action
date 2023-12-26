@@ -2,6 +2,7 @@ import sys
 import os
 import msal
 import glob
+import time
 from office365.graph_client import GraphClient
 from office365.runtime.odata.v4.upload_session_request import UploadSessionRequest
 from office365.onedrive.driveitems.driveItem import DriveItem
@@ -56,12 +57,16 @@ def resumable_upload(drive, local_path, file_size, chunk_size, max_retry, timeou
                 chunk_size, 
                 lambda offset: progress_status(offset, file_size)
             )
-            session_request.execute_query_retry(
-                qry,
-                max_retry=max_retry,
-                timeout_secs=timeout_secs,
-                success_callback=success_callback,
-                failure_callback=failure_callback)
+            retry_seconds = timeout_secs / max_retry
+            for session_request._range_data in session_request._read_next():
+                for retry_number in range(max_retry):
+                    try:
+                        super(UploadSessionRequest, session_request).execute_query(qry)
+                        break
+                    except Exception as e:
+                        retries += 1
+                        print(f"Retry {retry_number}: {e}")
+                        time.sleep(retry_seconds)
     
     file_name = os.path.basename(local_path)
     return_type = DriveItem(
@@ -84,7 +89,7 @@ def upload_file(drive, local_path, chunk_size):
             file_size, 
             chunk_size, 
             max_retry=60, 
-            timeout_secs=5*60)
+            timeout_secs=10*60)
 
 for f in local_files:
   try:
