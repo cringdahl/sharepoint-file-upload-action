@@ -61,8 +61,7 @@ def resumable_upload(drive, local_path, file_size, chunk_size, max_retry, timeou
                         super(UploadSessionRequest, session_request).execute_query(qry)
                         break
                     except Exception as e:
-                        retries += 1
-                        if retries >= max_retry:
+                        if retry_number + 1 >= max_retry:
                             raise e
                         print(f"Retry {retry_number}: {e}")
                         time.sleep(retry_seconds)
