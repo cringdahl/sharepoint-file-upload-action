@@ -17,6 +17,7 @@ client_id = sys.argv[4]
 client_secret = sys.argv[5]
 upload_path = sys.argv[6]
 file_path = sys.argv[7]
+max_retry = sys.argv[8]
 
 # below used with 'get_by_url' in GraphClient calls
 tenant_url = f'https://{sharepoint_host_name}/sites/{site_name}'
@@ -91,7 +92,11 @@ def upload_file(drive, local_path, chunk_size):
             timeout_secs=10*60)
 
 for f in local_files:
-  try:
-    upload_file(drive, f, 4*1024*1024)
-  except Exception as e:
-    print(f"Unexpected error occurred: {e}, {type(e)}")
+  for i in range(max_retry):
+    try:
+        upload_file(drive, f, 4*1024*1024)
+        break
+    except Exception as e:
+        print(f"Unexpected error occurred: {e}, {type(e)}")
+        if i == max_retry - 1:
+            raise e

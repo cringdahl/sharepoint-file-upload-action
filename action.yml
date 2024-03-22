@@ -23,6 +23,10 @@ inputs:
   client_secret:
     description: 'Sharepoint client secret'
     required: true
+  max_retries:
+    description: 'Max retries for upload'
+    required: false
+    default: 3
 outputs:
   return:
     description: 'Function output'
@@ -39,3 +43,4 @@ runs:
     - ${{ inputs.client_secret }}
     - ${{ inputs.upload_path }}
     - ${{ inputs.file_path }}
+    - ${{ inputs.max_retries }}
