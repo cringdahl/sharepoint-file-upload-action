@@ -17,7 +17,7 @@ client_id = sys.argv[4]
 client_secret = sys.argv[5]
 upload_path = sys.argv[6]
 file_path = sys.argv[7]
-max_retry = sys.argv[8] or 3
+max_retry = int(sys.argv[8]) or 3
 
 # below used with 'get_by_url' in GraphClient calls
 tenant_url = f'https://{sharepoint_host_name}/sites/{site_name}'
