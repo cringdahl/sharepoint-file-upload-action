@@ -17,7 +17,7 @@ client_id = sys.argv[4]
 client_secret = sys.argv[5]
 upload_path = sys.argv[6]
 file_path = sys.argv[7]
-max_retry = sys.argv[8]
+max_retry = sys.argv[8] or 3
 
 # below used with 'get_by_url' in GraphClient calls
 tenant_url = f'https://{sharepoint_host_name}/sites/{site_name}'
@@ -47,7 +47,7 @@ def progress_status(offset, file_size):
 def success_callback(remote_file):
     print(f"File {remote_file.web_url} has been uploaded")
 
-def resumable_upload(drive, local_path, file_size, chunk_size, max_retry, timeout_secs):
+def resumable_upload(drive, local_path, file_size, chunk_size, max_chunk_retry, timeout_secs):
     def _start_upload():
         with open(local_path, "rb") as local_file:
             session_request = UploadSessionRequest(
@@ -55,14 +55,14 @@ def resumable_upload(drive, local_path, file_size, chunk_size, max_retry, timeou
                 chunk_size, 
                 lambda offset: progress_status(offset, file_size)
             )
-            retry_seconds = timeout_secs / max_retry
+            retry_seconds = timeout_secs / max_chunk_retry
             for session_request._range_data in session_request._read_next():
-                for retry_number in range(max_retry):
+                for retry_number in range(max_chunk_retry):
                     try:
                         super(UploadSessionRequest, session_request).execute_query(qry)
                         break
                     except Exception as e:
-                        if retry_number + 1 >= max_retry:
+                        if retry_number + 1 >= max_chunk_retry:
                             raise e
                         print(f"Retry {retry_number}: {e}")
                         time.sleep(retry_seconds)
@@ -88,7 +88,7 @@ def upload_file(drive, local_path, chunk_size):
             local_path, 
             file_size, 
             chunk_size, 
-            max_retry=60, 
+            max_chunk_retry=60, 
             timeout_secs=10*60)
 
 for f in local_files:
