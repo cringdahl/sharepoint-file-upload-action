@@ -14,14 +14,8 @@ inputs:
   upload_path:
     description: 'Target upload path (see README.md)'
     required: true
-  tenant_id:
-    description: 'Sharepoint tenant ID'
-    required: true
-  client_id:
-    description: 'Sharepoint client ID'
-    required: true
-  client_secret:
-    description: 'Sharepoint client secret'
+  sharepoint_token:
+    description: 'Sharepoint token'
     required: true
   max_retries:
     description: 'Max retries for upload'
@@ -35,12 +29,10 @@ outputs:
 runs:
   using: 'docker'
   image: 'Dockerfile'
-  args: 
+  args:
     - ${{ inputs.site_name }}
     - ${{ inputs.host_name }}
-    - ${{ inputs.tenant_id }}
-    - ${{ inputs.client_id }}
-    - ${{ inputs.client_secret }}
     - ${{ inputs.upload_path }}
     - ${{ inputs.file_path }}
+    - ${{ inputs.sharepoint_token }}
     - ${{ inputs.max_retries }}

@@ -3,28 +3,22 @@
 Uploads one or more files (via glob) to Sharepoint site.
 
 ## Variables
-The following environment variables & secrets must be defined. 
+
+The following environment variables & secrets must be defined.
 
 If your full Sharepoint upload path is `https://example.sharepoint.com/sites/mygreatsite/Shared%20Documents/reports/detailed`, the following would be defined:
 
-* `host_name`
-  * `'example.sharepoint.com'`
-* `site_name`
-  * `'mygreatsite'`
-* `upload_path`
-  * `'reports/detailed'`
-
-
-The following will be provided to you by your Sharepoint administrator when you ask for a client ID. A reminder: _put secrets in **Settings/Security/Secrets and variables/Actions**_
-
-* `tenant_id`
-* `client_id`
-* `client_secret`
+- `host_name`
+  - `'example.sharepoint.com'`
+- `site_name`
+  - `'mygreatsite'`
+- `upload_path`
+  - `'reports/detailed'`
 
 You will also need to provide the file or files being sent:
 
-* `file_path`
-  * A glob; something like `file.txt` or `*.md`
+- `file_path`
+  - A glob; something like `file.txt` or `*.md`
 
 ## Example action.yml
 
@@ -40,11 +34,10 @@ jobs:
       - name: Send to Sharepoint
         uses: cringdahl/sharepoint-file-upload-action@1.0.0
         with:
-          file_path: "*.txt"
+          file_path: '*.txt'
           host_name: 'your.sharepoint.com'
           site_name: 'some_site'
           upload_path: 'fake_files'
-          tenant_id: ${{ secrets.SHAREPOINT_TENANT_ID }}
-          client_id: ${{ secrets.SHAREPOINT_CLIENT_ID }}
-          client_secret: ${{ secrets.SHAREPOINT_CLIENT_SECRET }}
+          sharepoint_token: 'some-token'
+          max_retries: optional, default 3
 ```
