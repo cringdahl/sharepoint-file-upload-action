@@ -26,6 +26,14 @@ You will also need to provide the file or files being sent:
 * `file_path`
   * A glob; something like `file.txt` or `*.md`
 
+The following are optional and only needed to access sharepoint intances in different clouds (ie Soverign Clouds)
+The defaults provided will work for all other cases
+
+* `login_endpoint`
+  * A Hostname; something like `login.microsoftonline.us`
+* `graph_endpoint`
+  * A Hostname; something like `graph.microsoft.us`
+
 ## Example action.yml
 
 ```yml

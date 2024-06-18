@@ -18,6 +18,8 @@ client_secret = sys.argv[5]
 upload_path = sys.argv[6]
 file_path = sys.argv[7]
 max_retry = int(sys.argv[8]) or 3
+login_endpoint = sys.argv[9] or "login.microsoftonline.com"
+graph_endpoint = sys.argv[10] or "graph.microsoft.com"
 
 # below used with 'get_by_url' in GraphClient calls
 tenant_url = f'https://{sharepoint_host_name}/sites/{site_name}'
@@ -29,13 +31,13 @@ def acquire_token():
     """
     Acquire token via MSAL
     """
-    authority_url = f'https://login.microsoftonline.us/{tenant_id}'
+    authority_url = f'https://{login_endpoint}/{tenant_id}'
     app = msal.ConfidentialClientApplication(
         authority=authority_url,
         client_id=client_id,
         client_credential=client_secret
     )
-    token = app.acquire_token_for_client(scopes=["https://graph.microsoft.us/.default"])
+    token = app.acquire_token_for_client(scopes=["https://{graph_endpoint}/.default"])
     return token
 
 client = GraphClient(acquire_token)
