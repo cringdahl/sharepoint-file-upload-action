@@ -29,13 +29,13 @@ def acquire_token():
     """
     Acquire token via MSAL
     """
-    authority_url = f'https://login.microsoftonline.com/{tenant_id}'
+    authority_url = f'https://login.microsoftonline.us/{tenant_id}'
     app = msal.ConfidentialClientApplication(
         authority=authority_url,
         client_id=client_id,
         client_credential=client_secret
     )
-    token = app.acquire_token_for_client(scopes=["https://graph.microsoft.com/.default"])
+    token = app.acquire_token_for_client(scopes=["https://graph.microsoft.us/.default"])
     return token
 
 client = GraphClient(acquire_token)
