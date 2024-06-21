@@ -27,6 +27,14 @@ inputs:
     description: 'Max retries for upload'
     required: false
     default: 3
+  login_endpoint:
+    description: 'Microsoft Online Login API Endpoint (see README.md)'
+    required: false
+    default: "login.microsoftonline.com"
+  graph_endpoint:
+    description: 'Microsoft Graph API Endpoint (see README.md)'
+    required: false
+    default: "graph.microsoft.com"
 outputs:
   return:
     description: 'Function output'
@@ -44,3 +52,5 @@ runs:
     - ${{ inputs.upload_path }}
     - ${{ inputs.file_path }}
     - ${{ inputs.max_retries }}
+    - ${{ inputs.login_endpoint }}
+    - ${{ inputs.graph_endpoint }}
