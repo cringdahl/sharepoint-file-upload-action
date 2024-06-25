@@ -37,7 +37,7 @@ def acquire_token():
         client_id=client_id,
         client_credential=client_secret
     )
-    token = app.acquire_token_for_client(scopes=["https://{graph_endpoint}/.default"])
+    token = app.acquire_token_for_client(scopes=[f"https://{graph_endpoint}/.default"])
     return token
 
 client = GraphClient(acquire_token)
