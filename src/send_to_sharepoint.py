@@ -40,7 +40,14 @@ def acquire_token():
     token = app.acquire_token_for_client(scopes=[f"https://{graph_endpoint}/.default"])
     return token
 
+#Replace office365 request url with the correct endpoint for non-default environments
+def rewrite_endpoint(request):
+    request.url = request.url.replace(
+        "https://graph.microsoft.com", f"https://{graph_endpoint}"
+    )
+
 client = GraphClient(acquire_token)
+client.before_execute(rewrite_endpoint, False)
 drive = client.sites.get_by_url(tenant_url).drive.root.get_by_path(upload_path)
 
 def progress_status(offset, file_size):
