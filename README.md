@@ -25,6 +25,9 @@ You will also need to provide the file or files being sent:
 
 * `file_path`
   * A glob; something like `file.txt` or `*.md`
+* `file_path_recursive_match`
+  * A Boolean; Find files recursively in subdirectories specified in `file_path`
+  * Defaults to 'false'
 
 The following are optional and only needed to access sharepoint intances in different clouds (ie Soverign Clouds)
 The defaults provided will work for all other cases

@@ -20,12 +20,13 @@ file_path = sys.argv[7]
 max_retry = int(sys.argv[8]) or 3
 login_endpoint = sys.argv[9] or "login.microsoftonline.com"
 graph_endpoint = sys.argv[10] or "graph.microsoft.com"
+file_path_recursive_match = sys.argv[11].lower() == 'true' if len(sys.argv) > 11 else False
 
 # below used with 'get_by_url' in GraphClient calls
 tenant_url = f'https://{sharepoint_host_name}/sites/{site_name}'
 
 # we're running this in actions, so we'll only ever have one .md file
-local_files = glob.glob(file_path)
+local_files = glob.glob(file_path, recursive=file_path_recursive_match)
 
 def acquire_token():
     """

@@ -35,6 +35,10 @@ inputs:
     description: 'Microsoft Graph API Endpoint (see README.md)'
     required: false
     default: "graph.microsoft.com"
+  file_path_recursive_match:
+    description: 'Find files recursively in subdirectories specified in file_path'
+    required: false
+    default: "false"
 outputs:
   return:
     description: 'Function output'
@@ -54,3 +58,4 @@ runs:
     - ${{ inputs.max_retries }}
     - ${{ inputs.login_endpoint }}
     - ${{ inputs.graph_endpoint }}
+    - ${{ inputs.file_path_recursive_match }}
