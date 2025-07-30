@@ -28,6 +28,10 @@ tenant_url = f'https://{sharepoint_host_name}/sites/{site_name}'
 # we're running this in actions, so we'll only ever have one .md file
 local_files = glob.glob(file_path, recursive=file_path_recursive_match)
 
+if not local_files:
+    print(f"[Error] No files matched pattern: {file_path}")
+    sys.exit(1)
+
 def acquire_token():
     """
     Acquire token via MSAL
@@ -55,7 +59,7 @@ def progress_status(offset, file_size):
     print(f"Uploaded {offset} bytes from {file_size} bytes ... {offset/file_size*100:.2f}%")
 
 def success_callback(remote_file):
-    print(f"File {remote_file.web_url} has been uploaded")
+    print(f"[✓]File {remote_file.web_url} has been uploaded")
 
 def resumable_upload(drive, local_path, file_size, chunk_size, max_chunk_retry, timeout_secs):
     def _start_upload():
