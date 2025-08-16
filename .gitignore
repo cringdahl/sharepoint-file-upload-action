@@ -1,4 +1,5 @@
 */.env
+.venv
 *.json
 *.md
 !README.md
