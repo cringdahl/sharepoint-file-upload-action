@@ -16,7 +16,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.REPO_PAT }}
       run: |
-        VERSION=${GITHUB_REF#refs/tags/}
-        MAJOR=${VERSION%%.*}
+        VERSION=${GITHUB_REF#refs/tags/} # ex: v2.3.4
+        MAJOR=${VERSION%%.*} # ex: v2
         git tag -fa "${MAJOR}" -m 'Update major version tag'
         git push origin "${MAJOR}" --force
