@@ -13,6 +13,8 @@ jobs:
     - uses: fregante/setup-git-user@v2 # just the @actions user
 
     - name: Get major version num and update tag
+      env:
+        GITHUB_TOKEN: ${{ secrets.REPO_PAT }}
       run: |
         VERSION=${GITHUB_REF#refs/tags/}
         MAJOR=${VERSION%%.*}
