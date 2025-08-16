@@ -24,7 +24,10 @@ The following will be provided to you by your Sharepoint administrator when you 
 You will also need to provide the file or files being sent:
 
 * `file_path`
-  * A glob; something like `file.txt` or `*.md`
+  * A glob; something like `file.txt`, `*.md`, or `**/*.pdf`
+* `file_path_recursive_match`
+  * A Boolean; Find files recursively in subdirectories specified in `file_path`
+  * Defaults to 'False'
 
 The following are optional and only needed to access sharepoint intances in different clouds (ie Soverign Clouds)
 The defaults provided will work for all other cases
@@ -48,7 +51,8 @@ jobs:
       - name: Send to Sharepoint
         uses: cringdahl/sharepoint-file-upload-action@1.0.0
         with:
-          file_path: "*.txt"
+          file_path: "**/*.txt"
+          file_path_recursive_match: False
           host_name: 'your.sharepoint.com'
           site_name: 'some_site'
           upload_path: 'fake_files'

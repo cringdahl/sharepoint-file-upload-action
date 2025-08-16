@@ -20,12 +20,17 @@ file_path = sys.argv[7]
 max_retry = int(sys.argv[8]) or 3
 login_endpoint = sys.argv[9] or "login.microsoftonline.com"
 graph_endpoint = sys.argv[10] or "graph.microsoft.com"
+file_path_recursive_match = sys.argv[11] if len(sys.argv) > 11 and sys.argv[11] else "False"
 
 # below used with 'get_by_url' in GraphClient calls
 tenant_url = f'https://{sharepoint_host_name}/sites/{site_name}'
 
 # we're running this in actions, so we'll only ever have one .md file
-local_files = glob.glob(file_path)
+local_files = glob.glob(file_path, recursive=file_path_recursive_match)
+
+if not local_files:
+    print(f"[Error] No files matched pattern: {file_path}")
+    sys.exit(1)
 
 def acquire_token():
     """
@@ -54,7 +59,7 @@ def progress_status(offset, file_size):
     print(f"Uploaded {offset} bytes from {file_size} bytes ... {offset/file_size*100:.2f}%")
 
 def success_callback(remote_file):
-    print(f"File {remote_file.web_url} has been uploaded")
+    print(f"[✓]File {remote_file.web_url} has been uploaded")
 
 def resumable_upload(drive, local_path, file_size, chunk_size, max_chunk_retry, timeout_secs):
     def _start_upload():
