@@ -108,7 +108,10 @@ def upload_file(drive, local_path, chunk_size):
 for f in local_files:
   for i in range(max_retry):
     try:
-        upload_file(drive, f, 4*1024*1024)
+        # Note: If your app splits a file into multiple byte ranges, the size of each byte range MUST be a multiple of 320 KiB (327,680 bytes).
+        # See: https://learn.microsoft.com/en-us/graph/api/driveitem-createuploadsession?view=graph-rest-1.0#example-2-upload-bytes-to-the-upload-session
+        chunk_size = 327_680 * 12 # ~4MB
+        upload_file(drive, f, chunk_size)
         break
     except Exception as e:
         print(f"Unexpected error occurred: {e}, {type(e)}")
